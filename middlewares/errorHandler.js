@@ -22,6 +22,14 @@ const errorHandler = (err, req, res, next) => {
     customError.error.message = `Please enter a valid _id`;
   }
 
+  if (err.details) {
+    httpStatusCode = StatusCodes.BAD_REQUEST;
+    customError.error.status = httpStatusCode;
+    customError.error.message = err.details.map(({ path, message }) => {
+      return { [path[0]]: message }
+    });
+  }
+
   res.status(httpStatusCode).json(customError);
 
 }

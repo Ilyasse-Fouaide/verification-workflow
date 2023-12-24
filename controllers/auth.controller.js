@@ -3,14 +3,14 @@ const isEmail = require('validator/lib/isEmail');
 const tryCatchWrapper = require("../tryCatchWrapper");
 const customError = require("../customError")
 const { setCookie } = require("../utils");
+const userSchema = require("../Joi/userSchema");
 const User = require("../models/user.model");
 
 module.exports.register = tryCatchWrapper(async (req, res, next) => {
   const { username, email, password } = req.body
 
-  if (!isEmail(email)) {
-    return next(customError.badRequestError("Please fill valid email."))
-  }
+  // Validate the data using Joi schema
+  await userSchema.validateAsync({ username, email, password }, { abortEarly: false });
 
   const count = await User.countDocuments();
   console.log(count);
@@ -23,7 +23,7 @@ module.exports.register = tryCatchWrapper(async (req, res, next) => {
     role
   });
 
-  // setCookie(res, user.genToken());
+  setCookie(res, user.genToken());
 
   res.status(StatusCodes.CREATED).json({ success: true })
 });
