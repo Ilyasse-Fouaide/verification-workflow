@@ -3,14 +3,14 @@ const isEmail = require('validator/lib/isEmail');
 const tryCatchWrapper = require("../tryCatchWrapper");
 const customError = require("../customError")
 const { setCookie } = require("../utils");
-const userSchema = require("../Joi/userSchema");
+const registerSchema = require("../Joi/registerSchema");
 const User = require("../models/user.model");
 
 module.exports.register = tryCatchWrapper(async (req, res, next) => {
   const { username, email, password } = req.body
 
   // Validate the data using Joi schema
-  await userSchema.validateAsync({ username, email, password }, { abortEarly: false });
+  await registerSchema.validateAsync({ username, email, password }, { abortEarly: false });
 
   const count = await User.countDocuments();
   console.log(count);

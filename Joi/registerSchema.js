@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-const userSchema = Joi.object({
+const registerSchema = Joi.object({
   username: Joi
     .string()
     .min(3)
@@ -13,4 +13,4 @@ const userSchema = Joi.object({
     .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$')),
 });
 
-module.exports = userSchema
+module.exports = registerSchema
