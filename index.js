@@ -3,7 +3,7 @@ const config = require("./config");
 
 const app = express();
 
-app.use("/api/v1/auth", require('./routes/auth.route'));
+app.use("/api/v1/auth", require('./routes/auth.routes'));
 
 const port = config.APP_PORT
 
