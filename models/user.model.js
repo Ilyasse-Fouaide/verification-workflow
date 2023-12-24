@@ -16,5 +16,13 @@ const userSchema = new Schema({
   },
 }, { timestamps: true });
 
+userSchema.pre("save", function () {
+  console.log("saved success")
+});
+
+userSchema.pre("deleteOne", function () {
+  console.log("removed")
+});
+
 const User = mongoose.model("users", userSchema);
 module.exports = User
