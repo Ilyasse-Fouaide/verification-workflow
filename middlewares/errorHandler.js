@@ -25,9 +25,11 @@ const errorHandler = (err, req, res, next) => {
   if (err.details) {
     httpStatusCode = StatusCodes.BAD_REQUEST;
     customError.error.status = httpStatusCode;
-    customError.error.message = err.details.map(({ path, message }) => {
+    const joiError = err.details.map(({ path, message }) => {
       return { [path[0]]: message }
     });
+    const message = Object.assign({}, ...joiError)
+    customError.error.message = message
   }
 
   res.status(httpStatusCode).json(customError);
