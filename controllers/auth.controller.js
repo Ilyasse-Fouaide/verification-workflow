@@ -13,19 +13,19 @@ module.exports.register = tryCatchWrapper(async (req, res, next) => {
   await registerSchema.validateAsync({ username, email, password }, { abortEarly: false });
 
   const count = await User.countDocuments();
-  console.log(count);
   const role = count === 0 ? "admin" : "basic";
 
   const user = await User.create({
     username,
     email,
     password,
-    role
+    role,
+    verificationToken: "TEMP: FakeToken"
   });
 
-  setCookie(res, user.genToken());
+  // setCookie(res, user.genToken());
 
-  res.status(StatusCodes.CREATED).json({ success: true })
+  res.status(StatusCodes.CREATED).json({ success: true, verificationToken: user.verificationToken })
 });
 
 module.exports.login = tryCatchWrapper(async (req, res, next) => {
@@ -45,6 +45,10 @@ module.exports.login = tryCatchWrapper(async (req, res, next) => {
 
   if (!compare) {
     return next(customError.notFoundError("Invalid Credentials."))
+  }
+
+  if (!user.isVerified) {
+    return next(customError.unAuthorizedError("Please verify your email."))
   }
 
   setCookie(res, user.genToken());

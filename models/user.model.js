@@ -22,7 +22,13 @@ const userSchema = new Schema({
     type: String,
     enum: ["basic", "admin"],
     default: "basic"
-  }
+  },
+  verificationToken: String,
+  isVerified: {
+    type: Boolean,
+    default: false
+  },
+  verifiedAt: Date
 }, { timestamps: true });
 
 userSchema.pre("save", function () {
