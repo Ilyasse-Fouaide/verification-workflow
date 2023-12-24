@@ -20,5 +20,5 @@ module.exports.forbiddenError = (message) => {
 }
 
 module.exports.notFoundError = (message) => {
-  return new CustomError(message, StatusCodes.FORBIDDEN)
+  return new CustomError(message, StatusCodes.NOT_FOUND)
 }
