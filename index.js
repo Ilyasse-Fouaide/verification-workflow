@@ -3,9 +3,12 @@ const config = require("./config");
 const connect = require("./db/connect");
 const notFound = require("./middlewares/noFound");
 const errorHandler = require("./middlewares/errorHandler");
+// cookies-parser
+const cookieParser = require("cookie-parser");
 
 const app = express();
 
+app.use(cookieParser())
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 

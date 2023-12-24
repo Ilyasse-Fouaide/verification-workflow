@@ -10,6 +10,18 @@ const errorHandler = (err, req, res, next) => {
     }
   }
 
+  if (err.code && err.code === 11000) {
+    httpStatusCode = StatusCodes.BAD_REQUEST;
+    customError.error.status = httpStatusCode;
+    customError.error.message = `The email has already been taken.`;
+  }
+
+  if (err.name && err.name === "CastError" && err.kind === "ObjectId") {
+    httpStatusCode = StatusCodes.BAD_REQUEST;
+    customError.error.status = httpStatusCode;
+    customError.error.message = `Please enter a valid _id`;
+  }
+
   res.status(httpStatusCode).json(customError);
 
 }

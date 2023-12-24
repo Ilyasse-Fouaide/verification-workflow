@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const config = require("../config");
 const { Schema } = mongoose
 
 const userSchema = new Schema({
@@ -36,6 +38,16 @@ userSchema.pre("save", function () {
 userSchema.pre("deleteOne", function () {
   console.log("removed")
 });
+
+userSchema.methods.genToken = function () {
+  const refresh_token = jwt.sign({
+    userId: this._id,
+    username: this.username,
+    role: this.role
+  }, config.JWT_SECRET, { expiresIn: config.JWT_LIFETIME });
+
+  return refresh_token;
+}
 
 const User = mongoose.model("users", userSchema);
 module.exports = User
