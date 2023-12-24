@@ -4,6 +4,7 @@ const tryCatchWrapper = require("../tryCatchWrapper");
 const customError = require("../customError")
 const { setCookie } = require("../utils");
 const registerSchema = require("../Joi/registerSchema");
+const crypto = require("crypto");
 const User = require("../models/user.model");
 
 module.exports.register = tryCatchWrapper(async (req, res, next) => {
@@ -15,18 +16,46 @@ module.exports.register = tryCatchWrapper(async (req, res, next) => {
   const count = await User.countDocuments();
   const role = count === 0 ? "admin" : "basic";
 
+  const verificationToken = crypto.randomBytes(40).toString("hex")
+
   const user = await User.create({
     username,
     email,
     password,
     role,
-    verificationToken: "TEMP: FakeToken"
+    verificationToken
   });
 
   // setCookie(res, user.genToken());
 
   res.status(StatusCodes.CREATED).json({ success: true, verificationToken: user.verificationToken })
 });
+
+module.exports.verifyEmail = tryCatchWrapper(async (req, res, next) => {
+  const { verificationToken, email } = req.body;
+
+  if (!verificationToken || !email) {
+    return next(customError.badRequestError("Missing fields"));
+  }
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return next(customError.unAuthorizedError("Verification Failed."))
+  }
+
+  if (verificationToken !== user.verificationToken) {
+    return next(customError.unAuthorizedError("Verification Failed"))
+  }
+
+  user.verificationToken = null;
+  user.isVerified = true;
+  user.verifiedAt = Date.now();
+  await user.save();
+
+  res.status(StatusCodes.OK).json({ success: true, message: "email verified." })
+});
+
 
 module.exports.login = tryCatchWrapper(async (req, res, next) => {
   const { email, password } = req.body;
