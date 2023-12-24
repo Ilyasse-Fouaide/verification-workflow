@@ -23,11 +23,31 @@ module.exports.register = tryCatchWrapper(async (req, res, next) => {
     role
   });
 
-  setCookie(res, user.genToken());
+  // setCookie(res, user.genToken());
 
   res.status(StatusCodes.CREATED).json({ success: true })
 });
 
 module.exports.login = tryCatchWrapper(async (req, res, next) => {
-  res.status(StatusCodes.CREATED).json({ success: true, message: "login" })
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return next(customError.badRequestError("email or password required."))
+  }
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return next(customError.notFoundError("Invalid Credentials."))
+  }
+
+  const compare = await user.comparePassword(password, user.password);
+
+  if (!compare) {
+    return next(customError.notFoundError("Invalid Credentials."))
+  }
+
+  setCookie(res, user.genToken());
+
+  res.status(StatusCodes.CREATED).json({ success: true })
 });
