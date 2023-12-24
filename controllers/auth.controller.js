@@ -1,8 +1,7 @@
 const { StatusCodes } = require("http-status-codes");
-const isEmail = require('validator/lib/isEmail');
 const tryCatchWrapper = require("../tryCatchWrapper");
 const customError = require("../customError")
-const { setCookie } = require("../utils");
+const { setCookie, sendEmail } = require("../utils");
 const registerSchema = require("../Joi/registerSchema");
 const crypto = require("crypto");
 const User = require("../models/user.model");
@@ -26,9 +25,20 @@ module.exports.register = tryCatchWrapper(async (req, res, next) => {
     verificationToken
   });
 
+  await sendEmail({
+    to: user.email,
+    subject: "Email confirmation",
+    html: `<h4>Hi!, ${user.username}</h4>
+      Please click on the following link to verify your account:<br/>
+      <a href="http://localhost:3000/verify?token=${user.verificationToken}&email=${user.email}">Click Here 👋</a>`
+  });
+
   // setCookie(res, user.genToken());
 
-  res.status(StatusCodes.CREATED).json({ success: true, verificationToken: user.verificationToken })
+  res.status(StatusCodes.CREATED).json({
+    success: true,
+    message: "Check your email address to verify account."
+  })
 });
 
 module.exports.verifyEmail = tryCatchWrapper(async (req, res, next) => {
