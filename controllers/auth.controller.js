@@ -3,13 +3,13 @@ const tryCatchWrapper = require("../tryCatchWrapper");
 const User = require("../models/user.model");
 
 module.exports.register = tryCatchWrapper(async (req, res, next) => {
-  // const { username, email, password } = req.body
+  const { username, email, password } = req.body
 
   const user = await User.create({
-    username: "dasd",
-    email: "sasd",
-    password: "123"
-  })
+    username,
+    email,
+    password
+  });
 
   res.status(StatusCodes.CREATED).json({ success: true, message: "register" })
 });
