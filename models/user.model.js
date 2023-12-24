@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 const { Schema } = mongoose
 
 const userSchema = new Schema({
@@ -8,6 +9,7 @@ const userSchema = new Schema({
   },
   email: {
     type: String,
+    unique: true,
     required: true
   },
   password: {
@@ -17,7 +19,13 @@ const userSchema = new Schema({
 }, { timestamps: true });
 
 userSchema.pre("save", function () {
-  console.log("saved success")
+  const user = this;
+
+  if (!user.isModified("password")) return;
+
+  const salt = bcrypt.genSaltSync(8);
+  const hashPassword = bcrypt.hashSync(user.password, salt);
+  return user.password = hashPassword
 });
 
 userSchema.pre("deleteOne", function () {
