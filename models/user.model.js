@@ -16,6 +16,11 @@ const userSchema = new Schema({
     type: String,
     required: true
   },
+  role: {
+    type: String,
+    enum: ["basic", "admin"],
+    default: "basic"
+  }
 }, { timestamps: true });
 
 userSchema.pre("save", function () {
