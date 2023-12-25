@@ -30,7 +30,7 @@ module.exports.register = tryCatchWrapper(async (req, res, next) => {
     subject: "Email confirmation",
     html: `<h4>Hi!, ${user.username}</h4>
       Please click on the following link to verify your account:<br/>
-      <a href="http://localhost:3000/verify?token=${user.verificationToken}&email=${user.email}">Click Here 👋</a>`
+      <a href="http://localhost:5173/verify?token=${user.verificationToken}&email=${user.email}">Click Here 👋</a>`
   });
 
   // setCookie(res, user.genToken());
