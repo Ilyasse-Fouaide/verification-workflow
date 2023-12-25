@@ -5,9 +5,12 @@ const notFound = require("./middlewares/noFound");
 const errorHandler = require("./middlewares/errorHandler");
 // cookies-parser
 const cookieParser = require("cookie-parser");
+// cors package
+const cors = require("cors");
 
 const app = express();
 
+app.use(cors());
 app.use(cookieParser())
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
