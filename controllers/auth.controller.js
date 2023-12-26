@@ -99,6 +99,10 @@ module.exports.logout = tryCatchWrapper(async (req, res, next) => {
   res.cookie("refresh_token", "", { httpOnly: true, expires: new Date(0) }).json({ success: true, message: "Logged Out success." })
 });
 
+module.exports.resetPassword = tryCatchWrapper(async (req, res, next) => {
+  res.status(StatusCodes.OK).json({ success: true, message: "Reset Password." })
+});
+
 module.exports.profile = tryCatchWrapper(async (req, res, next) => {
   res.status(StatusCodes.OK).json({ success: true, user: req.user })
 });
