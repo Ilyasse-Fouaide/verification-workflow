@@ -5,6 +5,7 @@ const { setCookie, sendEmail } = require("../utils");
 const registerSchema = require("../Joi/registerSchema");
 const crypto = require("crypto");
 const User = require("../models/user.model");
+const Token = require("../models/token.model");
 
 module.exports.register = tryCatchWrapper(async (req, res, next) => {
   const { username, email, password } = req.body
@@ -32,8 +33,6 @@ module.exports.register = tryCatchWrapper(async (req, res, next) => {
       Please click on the following link to verify your account:<br/>
       <a href="http://localhost:5173/verify?token=${user.verificationToken}&email=${user.email}">Click Here 👋</a>`
   });
-
-  // setCookie(res, user.genToken());
 
   res.status(StatusCodes.CREATED).json({
     success: true,
@@ -90,13 +89,28 @@ module.exports.login = tryCatchWrapper(async (req, res, next) => {
     return next(customError.unAuthorizedError("Please verify your email."))
   }
 
-  setCookie(res, user.genToken());
+  // create token
+  let refresh_token = "";
+
+  // checking for existing token
+  refresh_token = crypto.randomBytes(40).toString("hex");
+  const userAgent = req.headers['user-agent'];
+  const ip = req.ip;
+
+  const token = await Token.create({
+    refresh_token,
+    ip,
+    userAgent,
+    user: user._id
+  })
+
+  setCookie(res, user.genAccessToken(), user.genRefreshToken());
 
   res.status(StatusCodes.OK).json({ success: true })
 });
 
 module.exports.logout = tryCatchWrapper(async (req, res, next) => {
-  res.cookie("refresh_token", "", { httpOnly: true, expires: new Date(0) }).json({ success: true, message: "Logged Out success." })
+  res.cookie("access_token", "", { httpOnly: true, expires: new Date(0) }).json({ success: true, message: "Logged Out success." })
 });
 
 module.exports.resetPassword = tryCatchWrapper(async (req, res, next) => {

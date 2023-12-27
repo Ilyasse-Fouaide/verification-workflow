@@ -45,12 +45,23 @@ userSchema.pre("deleteOne", function () {
   console.log("removed")
 });
 
-userSchema.methods.genToken = function () {
-  const refresh_token = jwt.sign({
+userSchema.methods.genAccessToken = function () {
+  const access_token = jwt.sign({
     userId: this._id,
     username: this.username,
     role: this.role
-  }, config.JWT_SECRET, { expiresIn: config.JWT_LIFETIME });
+  }, config.JWT_SECRET);
+
+  return access_token;
+}
+
+userSchema.methods.genRefreshToken = function (refreshToken) {
+  const refresh_token = jwt.sign({
+    userId: this._id,
+    username: this.username,
+    role: this.role,
+    refreshToken
+  }, config.JWT_SECRET);
 
   return refresh_token;
 }
